@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Universal Unit Converter</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2em; background-color: #f0f2f5; }
+    h1 { text-align: center; color: #333; }
+    .converter { margin: 2em auto; max-width: 600px; background: white; padding: 2em; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    select, input { width: 100%; padding: 10px; margin-top: 10px; margin-bottom: 20px; font-size: 16px; }
+    .result { font-weight: bold; text-align: center; font-size: 1.2em; color: #2c3e50; }
+  </style>
+</head>
+<body>
+  <h1>Universal Unit Converter</h1>
+  <div class="converter">
+    <label for="inputValue">Enter value:</label>
+    <input type="number" id="inputValue" placeholder="e.g. 10" />
+
+    <label for="fromUnit">From:</label>
+    <select id="fromUnit"></select>
+
+    <label for="toUnit">To:</label>
+    <select id="toUnit"></select>
+
+    <div class="result" id="result">Result: -</div>
+  </div>
+
+  <script>
+    const units = {
+      // Length (meters as base)
+      'Millimeter (mm)': 0.001,
+      'Centimeter (cm)': 0.01,
+      'Meter (m)': 1,
+      'Kilometer (km)': 1000,
+      'Inch (in)': 0.0254,
+      'Foot (ft)': 0.3048,
+      'Yard (yd)': 0.9144,
+      'Mile (mi)': 1609.34,
+
+      // Mass (kilograms as base)
+      'Gram (g)': 0.001,
+      'Kilogram (kg)': 1,
+      'Metric ton (t)': 1000,
+      'Pound (lb)': 0.453592,
+      'Ounce (oz)': 0.0283495,
+
+      // Time (seconds as base)
+      'Second (s)': 1,
+      'Minute (min)': 60,
+      'Hour (h)': 3600,
+      'Day (d)': 86400,
+
+      // Temperature (custom handling)
+      'Celsius (C)': 'temp',
+      'Fahrenheit (F)': 'temp',
+      'Kelvin (K)': 'temp'
+    };
+
+    const fromSelect = document.getElementById('fromUnit');
+    const toSelect = document.getElementById('toUnit');
+    const input = document.getElementById('inputValue');
+    const resultDiv = document.getElementById('result');
+
+    for (let unit in units) {
+      const opt1 = document.createElement('option');
+      opt1.value = unit;
+      opt1.text = unit;
+      fromSelect.add(opt1);
+      const opt2 = document.createElement('option');
+      opt2.value = unit;
+      opt2.text = unit;
+      toSelect.add(opt2);
+    }
+
+    function convert() {
+      const val = parseFloat(input.value);
+      const from = fromSelect.value;
+      const to = toSelect.value;
+
+      if (isNaN(val)) {
+        resultDiv.innerText = 'Enter a valid number';
+        return;
+      }
+
+      if (units[from] === 'temp' || units[to] === 'temp') {
+        resultDiv.innerText = convertTemp(val, from, to);
+        return;
+      }
+
+      const base = val * units[from];
+      const converted = base / units[to];
+      resultDiv.innerText = `Result: ${converted.toFixed(4)}`;
+    }
+
+    function convertTemp(value, from, to) {
+      let kelvin;
+      if (from === 'Celsius (C)') kelvin = value + 273.15;
+      else if (from === 'Fahrenheit (F)') kelvin = (value - 32) * 5/9 + 273.15;
+      else kelvin = value;
+
+      let result;
+      if (to === 'Celsius (C)') result = kelvin - 273.15;
+      else if (to === 'Fahrenheit (F)') result = (kelvin - 273.15) * 9/5 + 32;
+      else result = kelvin;
+
+      return `Result: ${result.toFixed(2)}`;
+    }
+
+    input.addEventListener('input', convert);
+    fromSelect.addEventListener('change', convert);
+    toSelect.addEventListener('change', convert);
+  </script>
+</body>
+  </html>
+  
